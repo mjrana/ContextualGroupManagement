@@ -1,0 +1,5 @@
+@media only screen and (max-width: 479px) and (min-width: 320px) {
+ .LoginPage .page-header,.LoginPage .column6 {
+  display: none;
+ }
+}

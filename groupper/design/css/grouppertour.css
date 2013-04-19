@@ -1,0 +1,102 @@
+.evernote-tour .shadow {
+ -moz-background-size: 100% 8px;
+ -webkit-background-size: 100% 8px;
+ -o-background-size: 100% 8px;
+ background-size: 100% 8px;
+}
+
+.evernote-tour .tour-container {
+ border-bottom: 1px solid #EBEBEB;
+}
+
+.evernote-tour .tour-container.last {
+ margin-right: 0px;
+}
+
+.evernote-tour .tour-container.last {
+ border: none;
+}
+
+.evernote-tour .tour1 h4,.evernote-tour .tour2 h4,.evernote-tour .tour3 h4
+ {
+ font-weight: bold;
+}
+
+.evernote-tour {
+ background: none;
+ border: none;
+ float: left;
+ margin: 0 20px 10px 0;
+ padding: 0;
+}
+
+.evernote-tour .shadow {
+ display: none;
+}
+
+.evernote-tour .tour-container {
+ margin: 8px 0;
+}
+
+.evernote-tour .tour1,.evernote-tour .tour2,.evernote-tour .tour3 {
+ border: 4px solid #FFF;
+ min-height: 64px;
+ padding: 0 0 0 68px;
+}
+
+.evernote-tour .tour1 {
+ background-image: url('http://l-sls0483d.research.ltu.se/advuev/design/fb@2x.jpg');
+ background-repeat: no-repeat;
+}
+
+.evernote-tour .tour2 {
+ background-image: url('http://l-sls0483d.research.ltu.se/advuev/design/linkedin.jpg');
+ background-repeat: no-repeat;
+}
+
+.evernote-tour .tour3 {
+ background-image: url('http://l-sls0483d.research.ltu.se/advuev/design/smedia.jpg');
+ background-repeat: no-repeat;
+}
+
+@media only screen and (min-width: 930px) {
+  .evernote-tour{
+   width: 354px;
+   margin-top: 16px;
+  }
+}
+
+@media only screen and (max-width: 929px) and (min-width: 673px) {
+
+}
+
+@media only screen and (max-width: 673px) and (min-width: 321px) {
+ .evernote-tour {
+  margin: 10px 0px 0px 0px;
+  padding: 10px;
+  border: 4px solid #FFF;
+ }
+ .evernote-tour .shadow {
+  display: none;
+ }
+ .evernote-tour .tour-container {
+  margin-bottom: 10px;
+ }
+ .evernote-tour .tour1,.evernote-tour .tour2,.evernote-tour .tour3 {
+  line-height: 16px;
+  min-height: 40px;
+  padding-left: 50px;
+ }
+ .evernote-tour .tour1 {
+  background-image: url('/redesign/modules/Tour/evernote-tour1-small.png');
+  background-repeat: no-repeat;
+ }
+ .evernote-tour .tour2 {
+  background-image: url('/redesign/modules/Tour/evernote-tour2-small.png');
+  background-repeat: no-repeat;
+ }
+ .evernote-tour .tour3 {
+  background-image: url('/redesign/modules/Tour/evernote-tour3-small.png');
+  background-repeat: no-repeat;
+ }
+}

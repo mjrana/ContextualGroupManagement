@@ -1,0 +1,90 @@
+#login {
+        text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        width: 300px;
+        height: 200px;
+        padding: 50px;
+        font-size: 28px;
+        margin: 0px auto -1px auto; 
+        text-align: center;
+      }
+      
+       .activitylog {text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+      font-style:oblique;
+      height:100px;width:480px;float:left;
+      margin: 5px; 
+      }
+      
+      .controlpanel {text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+      
+      height:230px;width:600px;float:left;
+      margin: 5px;
+      }
+      
+      .functionalities {text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+      float:left;
+      height:100px;width:400px;
+      position:relative;
+      margin:5px;
+      text-align: center;
+      }
+      
+      .active {
+        text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        width: 700px;
+        height: 600px;
+        padding: 50px;
+        font-size: 16px;
+        margin: 0px auto -1px auto; 
+        
+      }
+      
+	.footercontainer{
+  		background-color: #FFFFFF;
+  		position:fixed;
+  		bottom: 0px;
+  		left:0px;
+  		width:100%;
+  		height:50px;
+	}
+
+	.footer-entry {
+ 		color: #ABABAB;
+ 		border-right: 1px solid #ABABAB;
+ 		font-size: 11px;
+ 		padding: 0 15px;
+	}
+
+	a.footer-entry:link,a.footer-entry:visited {
+ 		color: #ABABAB;
+ 		text-decoration: none;
+	}
+
+	a.footer-entry:hover,a.footer-entry:active {
+ 		color: #4A8DB8;
+ 		text-decoration: none;
+	}
+
+	.footer-entry.last {
+ 		border: 0;
+	}
+      
+	body 
+	{
+		background-image:url('http://l-sls0483d.research.ltu.se/advuev/design/bg.jpg');
+		background-color:#cccccc;
+	}

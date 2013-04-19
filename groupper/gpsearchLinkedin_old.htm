@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html xmlns:fb="https://www.facebook.com/2008/fbml">
+    <head>  
+    	
+    	<meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">       
+        <title>Groupper Service</title>
+        
+	    
+	    <link rel="stylesheet" href="scripts/main.css"/>
+	    <link rel="stylesheet" href="scripts/jquery.css">
+	    
+	    
+	    <script src="scripts/jquery-1.js"></script>
+	    <!--script src="scripts/jquery.js"></script-->
+	    <script src="scripts/md5.js" type="text/javascript" > </script>
+	    <script src="scripts/json2.js" type="text/javascript" > </script>
+		
+				
+		<!-- JIT Library File -->
+		<script language="javascript" type="text/javascript" src="scripts/jit-yc.js"></script>
+		
+		   <!-- these for graphics.... CSS Files -->
+		<link type="text/css" href="scripts/base.css" rel="stylesheet" />
+		<link type="text/css" href="scripts/ForceDirected.css" rel="stylesheet" />
+        <!--link rel="stylesheet" href="http://l-sls0483d.research.ltu.se/advuev/design/css/old_layout.css"-->
+        
+        <script language="javascript" type="text/javascript" src="scripts/jit.js"></script>
+
+  <!--      <script language="javascript" type="text/javascript" src="scripts/graph_visualizationComp.js"></script>-->
+	    
+	    <style>
+      #login {
+        text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        width: 300px;
+        height: 200px;
+        padding: 50px;
+        font-size: 28px;
+        margin: 0px auto -1px auto; 
+        text-align: center;
+      }
+      
+      
+      .active {
+        text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        width: 700px;
+        height: 600px;
+        padding: 50px;
+        font-size: 16px;
+        margin: 0px auto -1px auto; 
+        
+      }
+      
+      .adjustview{
+      	margin: 0px auto -1px auto;
+      }
+      body 
+	  {
+			background-image:url('design/bg.jpg');
+			background-color:#cccccc;
+	  }
+      </style>
+      
+      <link media="all" type="text/css" href="http://developer.linkedinlabs.com/tutorials/css/jqueryui.css" rel="stylesheet"/>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.5b1.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"></script> 
+    <script type="text/javascript" src="http://platform.linkedin.com/in.js">
+  		api_key: pbsmxfqyhtzl
+  		authorize: true
+	</script>
+      
+      <script type="text/javascript">
+	    
+	function loginChecker()
+	{
+		
+	IN.Event.on(IN, "systemReady", function() 
+    { 
+         	 
+    IN.User.refresh();
+	
+	 if(IN.User.isAuthorized()==true){
+		logged();
+		
+	}else
+	{
+		document.getElementById('con').style.display = "none";
+		document.getElementById('login').style.display = "block";		
+		
+	}
+	});                 	
+}
+
+function logout1()
+        {
+        	IN.Event.on(IN, "logout", function() {logout();});
+        	//IN.User.logout(function() {logout();});
+        	
+        }
+
+function logout()
+{
+        
+//a.onclick = function() {
+        if ( typeof IN === 'object' && typeof IN.User === 'object' && IN.User.isAuthorized() ) 
+        {
+        		alert("hi");
+        		IN.User.logout();
+        		//
+        		
+               	document.getElementById('login').style.display = "block";
+               	document.getElementById('content').style.display = "none";
+               	//IN.User.refresh();
+        }    // }  
+        return true;    
+}
+	
+
+function logged()
+{
+	  
+	  var userInfo=document.getElementById("user-info");
+	  
+	   IN.Event.on(IN, "systemReady", function() 
+       { 
+         	 
+         	// do something after logging in
+          	IN.Event.on(IN, "auth", function() 
+          	{
+           		 
+           		document.getElementById('login').style.display = "none";
+           		document.getElementById('con').style.display = "block";
+           		
+     IN.API.Profile("me")
+    .fields(["id", "firstName", "lastName", "pictureUrl","headline"])
+    .result(function(result) {
+      profile = result.values[0];
+      userInfo.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img class=img_border align=\"left\" src=\"" + profile.pictureUrl + "\"></br>&nbsp;&nbsp;&nbsp;&nbsp;" + profile.firstName + " " + profile.lastName;
+                  
+                    document.getElementById('con').style.display = 'block';
+                    document.getElementById('login').style.display = "none";
+                    
+                    user=profile.id;
+                    profilename=profile.firstName;
+                    token='acsdsdsd';
+                      ShowMyGroups();    	
+                  });
+                  
+         
+      		 });
+   		});
+ }
+
+
+
+function linklogin()
+{
+	var userInfo=document.getElementById("user-info");
+	   IN.Event.on(IN, "systemReady", function() 
+       { 
+         	// fire off the login popup
+         	if(!IN.User.isAuthorized())
+                 	IN.User.authorize();
+       });          	
+                 	
+       IN.Event.on(IN, "auth", function() 
+          	{
+           		//document.getElementById('ln-auth').innerHTML='Logout';
+           		document.getElementById('login').style.display = "none";
+           		document.getElementById('con').style.display = "block";
+           		
+     	IN.API.Profile("me")
+    	.fields(["id", "firstName", "lastName", "pictureUrl","headline"])
+    	.result(function(result) {
+      	profile = result.values[0];
+        userInfo.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img class=img_border align=\"left\" src=\"" + profile.pictureUrl + "\"></br>&nbsp;&nbsp;&nbsp;&nbsp;" + profile.firstName + " " + profile.lastName;
+                  
+                    document.getElementById('con').style.display = 'block';
+                    document.getElementById('login').style.display = "none";
+                    user=profile.id;
+                    profilename=profile.firstName;
+                    token='acsdsdsd';    
+                    ShowMyGroups(); 
+    });
+    });   
+}
+
+		var button;
+            var userInfo;
+			var user='';
+			var profilename='';
+			var token='';
+			var groupEmail='';
+			var context='';
+			var groupFrindsId=[];
+			var groupFrindsName=[];
+			var groupFrindsProfileUrl=[];
+			var groupFrindsPictureUrl=[];
+			var groupFrindsProfileEmail=[];
+			var noOfGroupMember=0;
+			var maildata='';
+			var JSONstring='';
+			var retMessage=[];
+			 
+			 
+            
+             //raanking function
+            function rank(retVal, userid) 
+            {
+				var socialnetwork = 'linkedin';
+				var data1 ="unrankedList=" + retVal + "&userId=" + userid + "&socialnetwork=" + socialnetwork;
+				var rankRequest = CreateXMLHttpRequest();
+				rankRequest.open("POST", "php/gpsearch/ranking.php", true);
+				rankRequest.onreadystatechange = function() {
+			 			if (rankRequest.readyState == 4) 
+			 			{ 
+							if (rankRequest.status == 200) 
+							{
+								rankedVal= rankRequest.responseText;
+								
+								var allText = jQuery.parseJSON(rankedVal);
+								
+								var html = '';
+						
+								html += "<ul class=\"ui-listview\" data-role=\"listview\">";
+								if (allText!=null)
+								for (var i=0;i<allText.length;i++)
+								{
+									 groupEmail=groupEmail+allText[i]["email"]+" ;";
+							 		 groupFrindsName[i]=allText[i]["name"];
+							 		 if(allText[i]["username"]!=null)
+											groupFrindsId[i]=allText[i]["username"];
+							 		 else
+											groupFrindsId[i]=allText[i]["userid"];
+									groupFrindsProfileEmail[i] = allText[i]["email"];
+							 		 groupFrindsProfileUrl[i] = allText[i]["profileurl"];
+							
+							 		 groupFrindsPictureUrl[i]=allText[i]["picture"];
+							
+							 		 html += "<li class=\"ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-btn-up-c\" data-theme=\"c\"><div aria-hidden=\"true\" class=\"ui-btn-inner ui-li\">";
+							 		 html += "<div class=\"ui-btn-text\">";														 
+							 		 html += "<a class=\"ui-link-inherit\" href=\"" +allText[i]["profileurl"] + "\">";
+							 		 html += "<img class=\"ui-li-thumb\" src=\"" + allText[i]["picture"] + "\">";
+							 		 html += "<h3 class=\"ui-li-heading\">" + allText[i]["name"] + "</h3>";
+							 		 html += "</a>";
+									 html += "</div>";
+									 html += "<span class=\"ui-icon ui-icon-arrow-r ui-icon-shadow\">";
+									 html += "</span>";
+									 html += "</div>";
+									 html += "</li>";							
+						 		}
+						 		noOfGroupMember=i;
+								html += "</ul>";
+						 		document.getElementById('searchResults').innerHTML =html;	
+							}
+						}						
+				}
+				rankRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				rankRequest.send(data1); 						
+			}
+			
+         function SATIN_readJson(){
+         	 var socialnetwork = 'linkedin';
+         	 document.getElementById('infovis').innerHTML = "";
+         	 context = document.getElementsByTagName("input")[0].value;
+         	 //alert( profilename);
+			 var data="context="+context+"&user="+user+"&token="+token+"&profilename="+profilename + "&socialnetwork=" + socialnetwork;
+		     //alert(data);
+			 var txtFile =CreateXMLHttpRequest();
+		     var retVal=[];
+			 txtFile.open("POST", "php/gpsearch/readJsonapiCombAdv_new2.php", true);
+			 //txtFile.open("POST", "http://dl.dropbox.com/u/68778400/readJsonapi.php", true);
+			 txtFile.onreadystatechange = function() {
+			 if (txtFile.readyState == 4) { 
+					if (txtFile.status == 200) { 						
+							retVal= txtFile.responseText;
+							
+							//rank(retVal, user);
+							
+							
+						var allText = jQuery.parseJSON(retVal);
+							
+														
+						 //alert(retVal);
+						var html = '';
+						
+						html += "<ul class=\"ui-listview\" data-role=\"listview\">";
+						if (allText!=null)
+						for (var i=0;i<allText.length;i++)
+						{
+							 groupEmail=groupEmail+allText[i]["email"]+" ;";
+							 groupFrindsName[i]=allText[i]["name"];
+							 if(allText[i]["username"]!=null)
+								groupFrindsId[i]=allText[i]["username"];
+							 else
+								groupFrindsId[i]=allText[i]["userid"];
+							 groupFrindsProfileEmail[i] = allText[i]["email"];
+							 groupFrindsProfileUrl[i] = allText[i]["profileurl"];
+							 //alert(allText[i]["profileurl"]);
+							 groupFrindsPictureUrl[i]=allText[i]["picture"];
+							
+							 html += "<li class=\"ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-btn-up-c\" data-theme=\"c\"><div aria-hidden=\"true\" class=\"ui-btn-inner ui-li\">";
+							 html += "<div class=\"ui-btn-text\">";														 
+							 html += "<a class=\"ui-link-inherit\" href=\"" +allText[i]["profileurl"] + "\">";
+							 html += "<img class=\"ui-li-thumb\" src=\"" + allText[i]["picture"] + "\">";
+							 html += "<h3 class=\"ui-li-heading\">" + allText[i]["name"] + "</h3>";
+							 html += "</a>";
+							 html += "</div>";
+							 html += "<span class=\"ui-icon ui-icon-arrow-r ui-icon-shadow\">";
+							 html += "</span>";
+							 html += "</div>";
+							 html += "</li>";							
+						 }
+						 noOfGroupMember=i;
+						 html += "</ul>";
+						 document.getElementById('searchResults').innerHTML =html;
+							
+							
+							
+					}
+				}						
+			}
+		txtFile.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		txtFile.send(data);			
+		//return retVal;
+							
+		}
+		
+			
+			function CreateXMLHttpRequest() {
+			if (typeof XMLHttpRequest != "undefined"){
+            //All modern browsers (IE7+, Firefox, Chrome, Safari, and Opera) uses XMLHttpRequest object
+				return new XMLHttpRequest();
+			}
+			else if (typeof ActiveXObject != "undefined") {
+				// Internet Explorer (IE5 and IE6) uses an ActiveX object
+				return new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			else {
+				throw new Error("XMLHttpRequestnot supported");
+			}
+		}
+		
+		
+		//for writting to json file
+			var user_fName='';
+			function runAjax(JSONstring,userfile)
+			{
+				user_fName=userfile+'.json';
+				var data="mail_data="+JSONstring+"&file="+user_fName+"&userid="+user;
+				request = CreateXMLHttpRequest();
+				//request.onreadystatechange = sendData;
+				request.onreadystatechange = function() {
+			 			if (request.readyState == 4) 
+			 			{ 
+							if (request.status == 200)
+							{
+								var retVal = request.responseText;
+								
+								var messageContent="Your group is successfully created. Please click on the link to view your group. http://A4360.research.ltu.se/groupper/jsonfiles/linkedin/"+ user+"/mygroups/"+user_fName;
+								SendMessage(messageContent);
+								ShowMyGroups();
+							}
+						}
+				}	 
+				
+				request.open("POST", "php/gpsearch/groupwritelinkedin.php", true);
+				
+				request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				
+				request.send(data);
+			}	
+	
+	//sending kinkedin message to the conections
+function SendMessage(messageContent) 
+{
+
+     var BODY = {
+        "recipients": {
+           "values": [{
+             "person": {
+                "_path": "/people/~", //+ friend,
+             }
+           }]
+         },
+       "subject": "Groupper Service!!! Your Newly formed Group",
+       "body": messageContent
+     }
+
+     IN.API.Raw("/people/~/mailbox")
+           .method("POST")
+           .body(JSON.stringify(BODY)) 
+           .result(displayMessageSent)
+           .error(function error(e) { alert ("No dice") });
+}
+
+function displayMessageSent() {
+    
+     //alert('message is sent successfully!');
+ }
+	
+	// uuid function
+	
+
+	function guuid()
+	{
+   		var chars = '0123456789abcdef'.split('');
+
+   		var uuid = [], rnd = Math.random, r;
+   		uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+   		uuid[14] = '4'; // version 4
+
+   		for (var i = 0; i < 36; i++)
+   		{
+      		if (!uuid[i])
+      		{
+        		 r = 0 | rnd()*16;
+
+        		 uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r & 0xf];
+      		}
+   		}
+
+   		return uuid.join('');
+	}
+
+	function sendGroup(){
+			
+			 
+			 var JSONObject=new Object();
+			 
+			 var groupName=context+"."+calcMD5(guuid());
+
+			 JSONObject.GroupTitle="Group_"+context;
+			 
+			
+			 var propertiesId={ 						
+							id: calcMD5(guuid()),
+							description: "group identifier",
+							required: "true"
+			};
+				
+			var propertiesName={ 						
+							description: groupName,
+							type: "string",
+							required: "true"				
+			};
+			
+			var ownerItems=[						
+							{ 
+								type: "string",
+								names: profilename	
+							},
+							{ 	
+								type: "id",
+								owner_id: user+'@facebook.com'
+							}	
+			]; 
+			 
+			 var propertiesOwner={ 						
+							required: "true",
+							type: "array",
+							items: ownerItems				
+			};
+			
+			var participantsItems=[];
+			
+			function ParticipantItems()
+			{
+				for(var j=0;j< noOfGroupMember;j++)
+				{
+						participantsItems[j]=
+								{ 
+									//type: "string",
+									name: groupFrindsName[j],	
+									participant_id: groupFrindsId[j],
+									participant_email: groupFrindsProfileEmail[j],
+									participant_profileurl: groupFrindsProfileUrl[j]
+								};		
+		 		  }	
+		 		  return participantsItems;
+		   }
+		   
+			var properties={ 						
+							id: propertiesId,
+							name: propertiesName,
+							owner: propertiesOwner,
+							participants: ParticipantItems()						
+			};
+			
+			JSONObject.properties= properties;
+			 
+			 JSONstring = JSON.stringify(JSONObject, null, '\t');
+			
+			 runAjax(encodeURIComponent(JSONstring),groupName);
+			 
+}
+
+//function for vsializing group
+
+function ShowMyGroups()
+{
+		var myGroupPath = "path=../../jsonfiles/linkedin/" + user + '/mygroups/';
+		var getGroup =CreateXMLHttpRequest();
+		
+		    	
+		getGroup.open("POST", "php/linkedin/getMyGroups.php", true);
+			 
+		getGroup.onreadystatechange = function() 
+		{
+			 if (getGroup.readyState == 4) 
+			 { 
+					if (getGroup.status == 200) 
+					{ 						
+							var groupNames= getGroup.responseText;
+							
+							if (groupNames=="NoGroups")
+							;
+							else{
+								
+							var html = '<h3 class="move-area">My Groups</h3>';
+							
+							
+							var filelink = '';	
+							var filename = '';
+							var groupFileNames=groupNames.toString().split(";");
+									
+							html += "<ul class=\"ui-listview\" data-role=\"listview\">";
+								
+								for (var i=1;i<groupFileNames.length;i++)
+								{
+									 filelink="http://A4360.research.ltu.se/groupper/jsonfiles/linkedin/"+user+"/mygroups/"+groupFileNames[i];
+									 filename=groupFileNames[i];
+									 var groupnameretrive=groupFileNames[i].toString().split(".");
+									 
+									 html += "<li class=\"ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-btn-up-c\" data-theme=\"c\"><div aria-hidden=\"true\" class=\"ui-btn-inner ui-li\">";
+							 		 html += "<div class=\"ui-btn-text\">";														 
+							 		 html += "<a class=\"ui-link-inherit\" href=\"" +filelink + "\">";
+							 		 html += "<img class=\"ui-li-thumb\" src=\"" + "http://A4360.research.ltu.se/groupper/design/group.jpg" + "\">";
+							 		 html += "<h3 class=\"ui-li-heading\">" + groupnameretrive[0].toUpperCase() + "</h3>";
+							 		 html += "</a>";
+									 html += "</div>";
+									 html += "<span class=\"ui-icon ui-icon-arrow-r ui-icon-shadow\">";
+									 html += "</span>";
+									 html += "</div>";
+									 html += "</li>";							
+						 		}
+						 		noOfGroupMember=i;
+								html += "</ul>";
+						 		document.getElementById('savedgroups').innerHTML =html;	
+						}
+							
+					}						
+				}
+			}
+			getGroup.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			getGroup.send(myGroupPath);
+		
+			//var groupFileNames= new Array("ericsson.63c1ffd219322063deef8e365da4aeea.json", "ltu.63c1ffd219322063deef8e365da4aeea.json");
+				
+			
+}
+	
+
+////grpah viewer start
+function VisualizeGroup1()
+{
+	    //alert (user);
+		var socialIdRequest = "user=" + user + "&datasource=facebookId";
+		var txtFile =CreateXMLHttpRequest();
+		
+		    	
+		txtFile.open("POST", "php/linkedin/getSocialid.php", true);
+			 
+		txtFile.onreadystatechange = function() 
+		{
+			 if (txtFile.readyState == 4) 
+			 { 
+					if (txtFile.status == 200) 
+					{ 						
+							var socialID= txtFile.responseText;
+							document.getElementById('infovis').innerHTML = "";
+							var gfile=socialID+'.facebook.Graph.json';
+							init(gfile);
+					}						
+				}
+			}
+			txtFile.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			txtFile.send(socialIdRequest);
+}
+	
+		
+	
+
+function VisualizeGroup2()
+{
+		var socialIdRequest = "user=" + user + "&datasource=linkedinId";
+		var txtFile =CreateXMLHttpRequest();
+		
+		    	
+		txtFile.open("POST", "php/linkedin/getSocialid.php", true);
+			 
+		txtFile.onreadystatechange = function() 
+		{
+			 if (txtFile.readyState == 4) 
+			 { 
+					if (txtFile.status == 200) 
+					{ 						
+							var socialID= txtFile.responseText;
+							document.getElementById('infovis').innerHTML = "";
+							var gfile=socialID+'.linkedin.Graph.json';
+							init(gfile);
+					}						
+				}
+			}
+			txtFile.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			txtFile.send(socialIdRequest);
+}
+function VisualizeGroup3()
+{
+		var socialIdRequest = "user=" + user + "&datasource=googlePlusId";
+		var txtFile =CreateXMLHttpRequest();
+		
+		    	
+		txtFile.open("POST", "php/linkedin/getSocialid.php", true);
+			 
+		txtFile.onreadystatechange = function() 
+		{
+			 if (txtFile.readyState == 4) 
+			 { 
+					if (txtFile.status == 200) 
+					{ 						
+							var socialID= txtFile.responseText;
+							document.getElementById('infovis').innerHTML = "";
+							var gfile=socialID+'.googlePlus.Graph.json';
+							init(gfile);
+					}						
+				}
+			}
+			txtFile.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			txtFile.send(socialIdRequest);
+}
+
+
+function VisualizeGroup(){
+				var gfile=user+'.linkedin.Graph.json';
+				document.getElementById('infovis').innerHTML = "";
+				init(gfile);
+}
+		
+
+
+var labelType, useGradients, nativeTextSupport, animate;
+var retVal=[];
+(function() {
+  var ua = navigator.userAgent,
+      iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
+      typeOfCanvas = typeof HTMLCanvasElement,
+      nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
+      textSupport = nativeCanvasSupport 
+        && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
+  //I'm setting this based on the fact that ExCanvas provides text support for IE
+  //and that as of today iPhone/iPad current text support is lame
+  labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
+  nativeTextSupport = labelType == 'Native';
+  useGradients = nativeCanvasSupport;
+  animate = !(iStuff || !nativeCanvasSupport);
+})();
+
+var Log = {
+    elem: false,
+    write: function(text)
+    {
+        if (!this.elem) 
+           this.elem = document.getElementById('log');
+        this.elem.innerHTML = text;
+        this.elem.style.left = (500 - this.elem.offsetWidth / 2) + 'px';
+    }
+};
+
+
+
+function init(gfile){
+         	
+			 var data="file="+ gfile;
+			 var txtFile =CreateXMLHttpRequest();
+		
+	
+			 txtFile.open("POST", "php/gpsearch/ReadGrapahJson.php", true);
+			 
+			 txtFile.onreadystatechange = function() 
+			 {
+			 	if (txtFile.readyState == 4) { 
+					if (txtFile.status == 200) { 						
+						json= eval('('+ txtFile.responseText + ')');
+							
+  							// init ForceDirected
+ 						var fd = new $jit.ForceDirected({
+    							//id of the visualization container
+    							injectInto: 'infovis',
+    							//Enable zooming and panning
+   								 //by scrolling and DnD
+    							Navigation: {
+      									enable: true,
+     								   //Enable panning events only if we're dragging the empty
+      									//canvas (and not a node).
+      									panning: 'avoid nodes',
+     									zooming: 10 //zoom speed. higher is more sensible
+    							},
+   								 // Change node and edge styles such as
+    								// color and width.
+    							// These properties are also set per node
+    							// with dollar prefixed data-properties in the
+    							// JSON structure.
+    							Node: {
+      									overridable: true,
+      
+    							},
+    							Edge: {
+      									overridable: true,
+      									color: '#F8E0EC',
+      									lineWidth: 1.8
+   								 },
+    							//Native canvas text styling
+    							Label: {
+      									type: labelType, //Native or HTML
+      									size: 10,
+      									color:'#4B8A08',
+      									style: 'bold'
+    							},
+    							//Add Tips
+    							Tips: {
+      										enable: true,
+      										onShow: function(tip, node) {
+        											//count connections
+        										var count = 0;
+        										node.eachAdjacency(function() { count++; });
+        										//display node info in tooltip
+        										tip.innerHTML = "<div class=\"tip-title\">" + node.name + "</div>"
+         										 + "<div class=\"tip-text\"><b>connections:</b> " + count + "</div>";
+      										}
+    							},
+    							// Add node events
+    							Events: {
+      										enable: true,
+      											//Change cursor style when hovering a node
+      										onMouseEnter: function() {
+        												fd.canvas.getElement().style.cursor = 'move';
+      										},
+      										onMouseLeave: function() {
+        												fd.canvas.getElement().style.cursor = '';
+      										},
+      										//Update node positions when dragged
+      										onDragMove: function(node, eventInfo, e) {
+          												var pos = eventInfo.getPos();
+          												node.pos.setc(pos.x, pos.y);
+          												fd.plot();
+      										},
+      										//Implement the same handler for touchscreens
+      										onTouchMove: function(node, eventInfo, e) {
+        												$jit.util.event.stop(e); //stop default touchmove event
+        												this.onDragMove(node, eventInfo, e);
+      										},
+      										//Add also a click handler to nodes
+      										onClick: function(node) {
+       													 if(!node) return;
+        												// Build the right column relations list.
+        												// This is done by traversing the clicked node connections.
+       													 var html = "<h4>" + node.name + "</h4><b> connections:</b><ul><li>",
+            											 list = [];
+        												 node.eachAdjacency(function(adj){
+          												 		list.push(adj.nodeTo.name);
+        												 });
+        												//append connections information
+        												$jit.id('inner-details').innerHTML = html + list.join("</li><li>") + "</li></ul>";
+      										}
+    							},
+    							//Number of iterations for the FD algorithm
+    							iterations: 200,
+    							//Edge length
+    							levelDistance: 130,
+    							// Add text to the labels. This method is only triggered
+    							// on label creation and only for DOM labels (not native canvas ones).
+    							onCreateLabel: function(domElement, node){
+      									domElement.innerHTML = node.name;
+      									var style = domElement.style;
+      									style.fontSize = "0.8em";
+      									style.color = "#ddd";
+    							},
+    							// Change node styles when DOM labels are placed
+   							    // or moved.
+    							onPlaceLabel: function(domElement, node){
+      									var style = domElement.style;
+      									var left = parseInt(style.left);
+      									var top = parseInt(style.top);
+      									var w = domElement.offsetWidth;
+      									style.left = (left - w / 2) + 'px';
+      									style.top = (top + 10) + 'px';
+      									style.display = '';
+    							}
+  					});
+  					// load JSON data.
+  					fd.loadJSON(json);
+  					// compute positions incrementally and animate.
+  					fd.computeIncremental({
+    						iter: 40,
+    						property: 'end',
+    						onStep: function(perc){
+      								Log.write(perc + '% loaded...');
+    						},
+    						onComplete: function(){
+      								Log.write('');
+     
+      								fd.animate({
+        									modes: ['linear'],
+        									transition: $jit.Trans.Elastic.easeOut,
+        									duration: 2500
+      								});
+    						}
+  					});
+  				// end
+	
+				}
+			}
+ 		}
+ 			
+		txtFile.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		txtFile.send(data);	
+ }						
+
+
+/////graph viewer end
+
+	    
+	</script>    
+	    
+	    
+	  </head>
+    
+   <body  onload="loginChecker()">                                                                                                                                                                                         
+
+       
+	<br />
+        <div id="login" style="display:none">
+         <h3>Linkedin Context Data Apps	</br>
+         	
+        <button onclick="linklogin()">LinkedIn Login</button></h3></div>
+        
+        
+        <div id = "con" style="display:none">
+	    	<div id="user-info" align="left" style="padding-top:20px"></div>
+	    	<div id = "input">
+				<input type="text" align="center" size="50" /><br />
+				<input type="button" align="center" onclick="SATIN_readJson()" value="Group Search"  />
+			</div>
+			
+			<!--Group search results-->	
+				<div id="groupview" class="adjustview">
+				<div id="searchResults" class="pane presence"> 
+				</div>
+			<!--Group send button-->	
+				<div id="sendbutton" class="pane presence_btn2"> 
+					<input type="button" data-inline="true" onclick="sendGroup()" value="Generate Group" />
+				</div>
+				
+			<!--Group visualization -->	
+				<div id="presence_container" class="pane infovis" style="display:block">
+       				<h3 class="move-area">Group Member's Visualization</h3>
+      
+           			<div id="refresh" >
+           				<a href="#" onclick="VisualizeGroup1()">Facebook graph</a>|
+           				<a href="#" onclick="VisualizeGroup2()">LinkedIn graph</a>|
+           				<a href="#" onclick="VisualizeGroup3()">GooglePlus graph</a>
+           				<div id="infovis"></div>
+           				<div id="log"></div>
+           				<!--  div id="user_list"-->
+      				</div>
+      			</div>
+      			
+      		<!-- Show my stored Groups -->	
+	      			<div id="savedgroups" class="pane svgroups">
+	      				<h3 class="move-area">My Groups</h3>
+	      				
+	      			</div>
+      			</div>
+			
+			
+			
+			<div class="footercontainer">		
+				<a href="" class="footer-entry">Terms of Service</a>
+  				<a href="" class="footer-entry">Privacy Policy</a>
+  				<a href="http://A4360.research.ltu.se/groupper/facebookapp.htm" class="footer-entry">Facebook Context Data Apps</a>
+  				<a href="" id ="activelogout" onclick = "logout();" class="footer-entry">Sign Out</a>
+  				<span class="footer-entry last">Academic Research Prototype.@PMC/LTU</span>
+			</div>
+			
+			
+	
+	</div>
+	
+	</body>
+        
+</html>

@@ -1,0 +1,648 @@
+
+
+<!--This page crawls several facebook tables and dumps users friend's information-->
+
+<!DOCTYPE html>
+<html xmlns:fb="https://www.facebook.com/2008/fbml">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ 
+        <title>ASG Based Group Management Tool</title>
+		
+		<script src="scripts/json2.js" type="text/javascript"> </script>
+		<script src="scripts/LNDataLibrary.js" type="text/javascript"> </script>
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+	    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"></script>
+	    <script type="text/javascript" src="scripts/FBDataLibrary.js"></script>
+        
+        <style>
+      #login {
+        text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        width: 300px;
+        height: 200px;
+        padding: 50px;
+        font-size: 28px;
+        margin: 0px auto -1px auto; 
+        text-align: center;
+      }
+      
+      .activitylog {text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+      height:120px;width:480px;float:left;
+      margin: 5px; 
+      }
+      
+      .controlpanel {text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+      
+      height:210px;width:600px;float:left;
+      margin: 5px;
+      }
+      
+      .functionalities {text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+      float:left;
+      height:100px;width:400px;
+      position:relative;
+      margin:5px;
+      text-align: center;
+      }
+      
+      
+      .active {
+        text-shadow: rgba(64, 64, 64, 0.496094) 6px 7px 5px;
+        -webkit-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        -moz-box-shadow: rgba(0, 0, 128, 0.246094) 8px 6px 3px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        width: 700px;
+        height: 600px;
+        padding: 50px;
+        font-size: 16px;
+        margin: 0px auto -1px auto; 
+        
+      }
+      
+     .footercontainer{
+	background-color: #FFFFFF;
+  position:fixed;
+  bottom: 0px;
+  left:0px;
+  width:100%;
+  height:50px;
+	
+	
+}
+
+.footer-entry {
+ color: #ABABAB;
+ border-right: 1px solid #ABABAB;
+ font-size: 11px;
+ padding: 0 15px;
+}
+
+a.footer-entry:link,a.footer-entry:visited {
+ color: #ABABAB;
+ text-decoration: none;
+}
+
+a.footer-entry:hover,a.footer-entry:active {
+ color: #4A8DB8;
+ text-decoration: none;
+}
+
+.footer-entry.last {
+ border: 0;
+}
+      
+      body 
+	  {
+			background-image:url('design/bg.jpg');
+			background-color:#cccccc;
+	  }
+      </style>
+      
+      <script type="text/javascript" src="http://platform.linkedin.com/in.js">
+ 			 api_key: pbsmxfqyhtzl
+ 			 authorize: true
+		</script>
+		
+	<script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+	<script type="text/javascript">
+	
+ var userid;
+ var facebookUserId;
+/*linkedIn Login start*/
+function loginChecker()
+{
+	IN.Event.on(IN, "systemReady", function() 
+     { 
+         IN.User.refresh();
+	
+		if(IN.User.isAuthorized()==true){
+			Update_linkedin_IndexFile();
+			logged();
+		}else
+		{
+			document.getElementById('content').style.display = "none";
+			document.getElementById('login').style.display = "block";
+		}
+	});                 	
+}
+
+
+//linkedin login & logout function
+function linklogin()
+{
+	   IN.Event.on(IN, "systemReady", function() 
+       { 
+          	 IN.User.refresh();
+           	if(!IN.User.isAuthorized())
+                 	IN.User.authorize();
+           	IN.Event.on(IN, "auth", function() 
+          	{
+           		 Update_linkedin_IndexFile();
+           		
+           		document.getElementById('login').style.display = "none";
+           		document.getElementById('content').style.display = "block";
+           		document.getElementById('other').style.display = "block";
+           		
+           		 IN.API.Profile("me")
+  						.fields(["id", "firstName", "lastName","headline","location","pictureUrl","publicProfileUrl", "skills", "positions","educations", "dateOfBirth"])
+                		.result( function(me) {
+                       		 var myprofile = me.values[0];
+                        	username=myprofile.firstName + " " + myprofile.lastName;
+                        	var userid= myprofile.id;
+                        	document.getElementById('user-info').innerHTML='<img src="' + myprofile.pictureUrl +'" width="100" height="100">'+ username +'</br>';
+                   		
+          				    notification_information(userid);
+                  });           		
+         
+      		 });
+   		});
+ }	
+ 
+
+function logged()
+{
+	   IN.Event.on(IN, "systemReady", function() 
+       { 
+           	IN.Event.on(IN, "auth", function() 
+          	{
+           		
+           		document.getElementById('login').style.display = "none";
+           		document.getElementById('content').style.display = "block";
+           		document.getElementById('other').style.display = "block";
+           		
+           		 IN.API.Profile("me")
+  						.fields(["id", "firstName", "lastName","headline","location","pictureUrl","publicProfileUrl", "skills", "positions","educations", "dateOfBirth"])
+                		.result( function(me) {
+                       		var myprofile = me.values[0];
+                        	username=myprofile.firstName + " " + myprofile.lastName;
+                        	userid= myprofile.id;
+                        	document.getElementById('user-info').innerHTML='<img src="' + myprofile.pictureUrl +'" width="100" height="100"> &nbsp;&nbsp;&nbsp;&nbsp;'+ username +'<br />';
+                			notification_information(userid);
+          	       });
+                
+      		 });
+   		});
+ }
+
+function Update_linkedin_IndexFile()
+{
+     
+       IN.Event.on(IN, "systemReady", function() {
+      	 IN.API.Profile("me")
+  			.fields(["id", "firstName", "lastName","headline","location","pictureUrl","publicProfileUrl", "skills", "positions","educations", "dateOfBirth"])
+                .result( function(me) {
+                       	var myprofile = me.values[0];
+                        var userId= myprofile.id;
+      	                var sentData = "userId=" + userId;
+      	                 //alert(sentData);
+      	                var request = CreateXMLHttpRequest();
+                        var retMessage='';
+                        
+                        request.open("POST", "php/linkedin/linkedin_indexing.php", true);
+                         
+                        request.onreadystatechange = function() 
+                        {
+                            if (request.readyState == 4) 
+                            { 
+                                 if (request.status == 200) 
+                                 {                                               
+                                       retMessage= request.responseText;
+                                       //alert(retMessage);                             
+                                 }                                               
+                            }
+                        }
+                        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        request.send(sentData);
+                });
+       });
+}
+
+		
+function logout()
+{
+        if ( typeof IN === 'object' && typeof IN.User === 'object' && IN.User.isAuthorized() ) 
+        {
+        		IN.User.logout();
+        		IN.User.refresh();
+               	document.getElementById('login').style.display = "block";
+               	document.getElementById('content').style.display = "none";
+        }          
+}
+
+/*LinkedIn login end*/
+
+		/* user notification */
+							
+	function notification_information(userid)
+		{
+				var data = "userId=" + userid;
+				
+				var request = CreateXMLHttpRequest();
+						
+				request.onreadystatechange = function()
+				{
+					if(request.readyState == 4)
+					{
+						if (request.status == 200) 
+						{ 	
+							var notificationMsg = request.responseText;
+							var processNotificationM=notificationMsg.split(",");
+							
+							var showmessage = '<h3 align="center">Your Activity Log</h3>';
+							
+							showmessage= showmessage +"Last Update Time " + processNotificationM[0];
+							
+							if(processNotificationM[1]!=null&&processNotificationM[1]!="")
+							{
+								showmessage =showmessage +"</br> Facebook ID "+ processNotificationM[1] +" is associated with your account";														
+							}
+							
+							if(processNotificationM[2]!=null&&processNotificationM[2]!="")
+							{
+								showmessage =showmessage + "</br>Google+ ID "+ processNotificationM[2] +" is associated with your account";	
+																			
+							}
+							
+							document.getElementById('notification').innerHTML=showmessage;
+							
+						}
+					}
+				}
+				request.open("POST", "php/linkedin/linkedin_notification.php", true);
+				request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				request.send(data);
+		}	
+
+
+	/* gmail association start*/
+            
+      var clientId = '828824956587-ha721fhu6l285dh9ps7273bkg44ilt44.apps.googleusercontent.com';
+      var apiKey = 'AIzaSyCUGg4YNuEHI-4hTJMwdHy5y30r8-1UH_Q';
+
+      // To enter one or more authentication scopes, refer to the documentation for the API.
+      var scopes = 'https://www.googleapis.com/auth/plus.me';
+	  var googlePlusUserId=''; 	
+ 
+ 
+ 
+ // Use a button to handle authentication the first time.
+function handleClientLoad() 
+{
+        gapi.client.setApiKey(apiKey);
+        window.setTimeout(checkAuth,1);
+}
+
+function checkAuth() 
+{
+       gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
+}
+
+     
+function handleAuthResult(authResult) 
+{
+       if (authResult) {
+               makeApiCall();
+        } 
+}
+
+function handleAuthClick(event) 
+{
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
+}
+
+
+function makeApiCall() 
+{
+     gapi.client.load('plus', 'v1', function() {
+      		var request = gapi.client.plus.people.get({
+            	'userId': 'me'
+      		});
+      		request.execute(function(resp) {
+            	googlePlusUserId = resp.id;
+           
+            	Update_google_IndexFile(googlePlusUserId);
+       });
+    });
+}
+
+
+function Update_google_IndexFile(googlePlusUserId)
+{
+     
+       IN.Event.on(IN, "systemReady", function() {
+      	 IN.API.Profile("me")
+  			.fields(["id", "firstName", "lastName","headline","location","pictureUrl","publicProfileUrl", "skills", "positions","educations", "dateOfBirth"])
+                .result( function(me) {
+                       	var myprofile = me.values[0];
+                        var userId= myprofile.id;
+      	                var sentData = "googlePlusUserId=" + googlePlusUserId + "&userId=" + userId;
+      	                 //alert(sentData);
+      	                var request = CreateXMLHttpRequest();
+                        var retMessage='';
+                        
+                        request.open("POST", "php/googleplus/gp_association.php", true);
+                         
+                        request.onreadystatechange = function() 
+                        {
+                            if (request.readyState == 4) 
+                            { 
+                                 if (request.status == 200) 
+                                 {                                               
+                                       retMessage= request.responseText;
+                                       alert(retMessage);
+                                        
+                                       //logoutGP();                           
+                                 }                                               
+                            }
+                        }
+                        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        request.send(sentData);
+                });
+       });
+ }	
+/*gmail association end*/
+
+		
+/*facebook association start*/
+
+//Facebook initialization
+function facebookIndexing()
+{ 
+	   
+       window.fbAsyncInit = function() 
+       {
+            FB.init({ appId: '442535435766762',
+                    status: true,
+                    cookie: true,
+                    xfbml: true,
+                    oauth: true
+           });
+           
+           FB.getLoginStatus(logincheck);
+           
+           function logincheck(response)
+           {
+         
+              if (response.authResponse) { 
+                 FB.api('/me', function(info) 
+                 {
+                      facebookAssociation(response, info);                                                 
+		         });
+               }
+               else {
+               	       FB.login(function(response) {  
+               	       	 if (response.authResponse) { 
+                                FB.api('/me', function(info) 
+                                {
+                                     facebookAssociation(response, info);                                                 
+		                        });
+                          }       
+                    }, {scope:'email, user_birthday, friends_birthday, user_hometown, read_mailbox, friends_work_history, user_work_history, user_location, friends_location, friends_status, friends_activities, friends_education_history, user_groups, friends_groups, friends_about_me, user_about_me'});       
+               }
+           }
+    };
+                    
+     (function() {
+                var e = document.createElement('script'); e.async = true;
+                e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+                document.getElementById('fb-root').appendChild(e);
+     }());
+}    
+      
+function facebookAssociation(response, info)
+{
+        
+        if (response.authResponse) {
+       	       facebookUserId = info.id;
+       }	
+       IN.Event.on(IN, "systemReady", function() {
+      	 IN.API.Profile("me")
+  			.fields(["id", "firstName", "lastName","headline","location","pictureUrl","publicProfileUrl", "skills", "positions","educations", "dateOfBirth"])
+                .result( function(me) {
+                       	var myprofile = me.values[0];
+                        var userId= myprofile.id;
+      	                var sentData = "facebookUserId=" + facebookUserId + "&userId=" + userId;
+      	                 //alert(sentData);
+      	                var request = CreateXMLHttpRequest();
+                        var retMessage='';
+                        
+                        request.open("POST", "php/facebook/fb_association.php", true);
+                         
+                        request.onreadystatechange = function() 
+                        {
+                            if (request.readyState == 4) 
+                            { 
+                                 if (request.status == 200) 
+                                 {                                               
+                                       retMessage= request.responseText;
+                                       
+                                       
+                                      // document.getElementById('fbdata-button').disabled = false;
+                                       alert(retMessage);                             
+                                 }                                               
+                            }
+                        }
+                        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        request.send(sentData);
+                });
+    });
+}
+
+/*facebook association end*/
+
+/* get user's linkedin data*/
+
+function LNAutorization()
+{  
+	alert('You are already authorized!!');
+}
+
+function getLNData()
+{ 
+	loadData();	
+}
+
+function deleteLNData()
+{ 
+	ln_delete_file(userid);
+}
+
+function showLNData()
+{  
+	ln_show_file(userid);
+}
+
+/* get user's gmail data*/
+function getGPData()
+{ 
+	
+	     var gmailuserid=document.getElementById("userid").value;
+         var gmailpass=document.getElementById("password").value;
+         
+         if(googlePlusUserId.length>0)
+		 {	 
+		 	 showLoader(true);
+	         var gmaillogindata="userid="+gmailuserid+"&password="+gmailpass+"&googleplususerid="+googlePlusUserId;
+	         var txtFile =CreateXMLHttpRequest();
+	         var retMessage='';
+	                        
+	         txtFile.open("POST", "php/gpsearch/readGmail.php", true);
+	                         
+	         txtFile.onreadystatechange = function() 
+	         {
+	                 if (txtFile.readyState == 4) 
+	                 { 
+	                       if (txtFile.status == 200) 
+	                       {                                               
+	                             retMessage= txtFile.responseText;
+	                             showLoader(false);
+	                             alert(retMessage);
+	                             
+	                             document.getElementById('show').style.display = "none";
+	                             
+	                             runAggregator(userid);
+	                             
+	                                                        
+	                       }                                               
+	                 }
+	          }
+	          txtFile.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	          txtFile.send(gmaillogindata);	
+	     }else
+	        alert("Please Authorize!!!");
+}
+
+function showGPData()
+{  
+	
+	gp_show_file(userid);
+	
+}
+function deleteGPData()
+{ 
+	
+	gp_delete_file(userid);
+	
+}
+
+function getFBData()
+{ 
+	
+	if(facebookUserId != undefined)
+		facebook_lastupdate();
+	else
+		alert('Please Authorize yourself');
+}
+
+function deleteFBData()
+{ 
+	fb_delete_file();
+}
+
+function showFBData()
+{  
+	fb_show_file(userid);
+}
+
+function showdiv(){
+		
+		document.getElementById('show').style.display = "block";
+}
+
+function viewGroups(){
+	alert("Coming Soon!!!");
+}
+
+
+</script>
+
+</head>
+  <body onload="loginChecker()">
+    	
+     <div id="fb-root"></div>
+       
+		<div id="login">
+		<h3>ASG Based Group Management Tool</br>	
+        <button id="ln-auth" onclick="linklogin()">Login through LinkedIn Credentials</button></h3>
+        </div>
+        </br><br/>
+         
+        <div id="content"  style="display:none">
+        <div id="middlecontent" class="active">	
+	
+       	<div id='user-info'></div>
+       	</br>
+       	<div id="notification" class="activitylog"></div>
+		
+       				 
+        				<div id="socialnetworks"  class="controlpanel" align="center">
+        					<h3>Social Data Aggregation Panel</h3>
+        	    			<ul><label id="fblauthorized" > Facebook </label> 
+        	    				<input type="button" id="fbauthorize-button" onclick = "facebookIndexing()" value="Add Social ID"></input>        	    				  
+        	    				 <input type="button" id="fbdata-button" onclick = "getFBData()" value="Add Social Data" ></input>
+        	    				<input type="button" id="lndatashow-button" onclick = "showFBData()" value="View Social Data" ></input>
+        	    				<input type="button" id="lndatadelete-button" onclick = "deleteFBData()" value="Delete Social Data" ></input>
+        	    			</ul>
+        	    			
+        	    			<ul> <label id="lnlauthorized" > LinkedIn </label>      
+        	    				<input type="button" id="lnauthorize-button" onclick = "LNAutorization()" value="Add Social ID"></input>    	    				
+        	    				<input type="button" id="lndata-button" onclick="getLNData()" value="Add Social Data"></input>
+		 						<input type="button" id="lndatashow-button" onclick = "showLNData()" value="View Social Data" ></input>
+		 						<input type="button" id="lndatadelete-button" onclick="deleteLNData()" value="Delete Social Data"></input>
+        	    			</ul>
+        	    			
+        	    			<ul> <label id="gplauthorized" > Google+ </label> 
+        	    				<input type="button" id="gpauthorize-button" onclick = "checkAuth()" value="Add Social ID"></input>
+        	    				 <input type="button" id="gpdata-button" onclick = "showdiv()" value="Add Social Data"></input>
+        	    				<input type="button" id="gpdatashow-button" onclick = "showGPData()" value="View Social Data" ></input>
+        	    				 <input type="button" id="gpdatadelete-button" onclick = "deleteGPData()" value="Delete Social Data" ></input>
+        	    				
+        	    				<div id="show" style="display:none">
+        	    					<label>Username</label> 	
+   		 							<input id="userid" maxlength="64" name="userid" type="text">
+   		 							<label>Password</label> 		
+   		 							<input id="password" maxlength="64" name="password" type="password">
+								 	<input type="button" onclick="getGPData()" value="Generate">
+		 						</div>
+        	    				
+        	    			</ul>        	    			
+        	    			
+          				</div>
+       	 </br></br></br>
+        <div id="other" align="center" class="functionalities">		 
+        	<h3>Group Management Tools</h3>
+		 <input type="button" onclick="window.open('http://A4360.research.ltu.se/groupper/gpsearchLinkedin.htm')" value="ASG Based Group Formation tool">
+		 <input type="button" onclick="viewGroups()" value="Re-usable groups">
+	     <input type="button" id="activelogout" onclick="logout()" value="Sign Out">
+			
+        </div>
+		</div>
+		
+		<div id="loader" align= "center" style="display:none">
+           <img src="design/ajax-loader.gif" alt="loading" />
+       </div>
+       
+		<div class="footercontainer">		
+				<a href="" class="footer-entry">Terms of Service</a>
+  				<a href="" class="footer-entry">Privacy Policy</a>
+  				<a href="http://A4360.research.ltu.se/groupper/" class="footer-entry">Aggregated Social Graph Service Main Page</a>
+  				<span class="footer-entry last">Academic Research Prototype.@PMC/LTU</span>
+		</div>
+		
+       </div>
+      
+    </body>
+</html>

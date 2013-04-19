@@ -1,0 +1,199 @@
+
+
+<!--This page crawls several facebook tables and dumps users friend's information-->
+
+<!DOCTYPE html>
+<html xmlns:fb="https://www.facebook.com/2008/fbml">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ 
+        <title>Social Data Aggregator</title>
+		
+	<!--	<script src="scripts/jquery-1.7.1.min.js" type="text/javascript" > </script>
+	-->
+		<script src="scripts/json2.js" type="text/javascript" > </script>
+		
+        <!--
+            @author: Sarwar Morshed
+        -->
+    </head>
+    <body>
+        <div id="fb-root"></div>
+        <script type="text/javascript">
+            var button;
+            var userInfo;
+            var userprofileurl;
+
+            window.fbAsyncInit = function() {
+                FB.init({ appId: '152060491561277',
+                    status: true,
+                    cookie: true,
+                    xfbml: true,
+                    oauth: true});
+
+               showLoader(true);
+
+               function updateButton(response) {
+                    button       =   document.getElementById('fb-auth');
+                    userInfo     =   document.getElementById('user-info');
+
+                    if (response.authResponse) {
+                        //user is already logged in and connected
+                        FB.api('/me', function(info) {
+                            login(response, info);
+                        });
+						
+                        button.onclick = function() {
+                        	
+                            FB.logout(function(response) {
+                                logout(response);
+                                window.location.reload(true); 
+                                 updateButton(response);
+                                 
+                            });
+                           
+                        };
+                    } else {
+                        //user is not connected to your app or logged out
+                       button.innerHTML = 'Facebook Login';
+                        button.onclick = function() {
+                            showLoader(true);
+                            FB.login(function(response) {
+                                if (response.authResponse) {
+                                    //FB.api('/me/friends', function(info) {
+									FB.api('/me', function(info) {
+                                        login(response, info);
+                                    });
+                                } else {
+                                    //user cancelled login or did not grant authorization
+                                    showLoader(false);
+                                }
+                            }, {scope:'email, user_birthday, friends_birthday, user_hometown, read_mailbox, friends_work_history, user_work_history,friends_location, friends_status, friends_activities, friends_education_history, user_groups, friends_groups, friends_about_me, user_about_me'});
+							
+                        }
+                    }
+                }
+				
+                // run once with current status and whenever the status changes
+                FB.getLoginStatus(updateButton);
+                FB.Event.subscribe('auth.statusChange', updateButton);
+            };
+            (function() {
+                var e = document.createElement('script'); e.async = true;
+                e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+                document.getElementById('fb-root').appendChild(e);
+            }());
+
+            function login(response, info){
+                if (response.authResponse) {
+                    var accessToken = response.authResponse.accessToken;
+					userprofileurl=info.profile_url;
+					button.innerHTML = 'Logout';
+                    showLoader(false);
+                    document.getElementById('other').style.display = "block";
+                }
+            }
+
+            function logout(response)
+            {
+            	
+                userInfo.innerHTML = "";
+                button.innerHTML = 'Facebook Login';
+                document.getElementById('debug').innerHTML = "";
+                document.getElementById('other').style.display = "none";
+                showLoader(false);
+
+            }
+
+		
+		function CreateXMLHttpRequest() 
+		{
+			if (typeof XMLHttpRequest != "undefined"){
+            //All modern browsers (IE7+, Firefox, Chrome, Safari, and Opera) uses XMLHttpRequest object
+				return new XMLHttpRequest();
+			}
+			else if (typeof ActiveXObject != "undefined") {
+				// Internet Explorer (IE5 and IE6) uses an ActiveX object
+				return new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			else {
+				throw new Error("XMLHttpRequestnot supported");
+			}
+		}
+			
+			//for writting to json file for evaluation data collection
+		
+		function runAjaxEvaluation(user)
+		{
+				var user_fileName=user;
+				var data="userId="+user;
+				
+				request = CreateXMLHttpRequest();
+			
+				request.onreadystatechange = function()
+				{
+					if(request.readyState == 4)
+					{
+						if (request.status == 200) 
+						{ 	
+							// parser.php response
+							var JSONtext = request.responseText;
+							alert('Your profile and interaction file is updated!!! Thank you');	
+						}
+					 }
+				}
+				request.open("POST", "php/aggregator/dataag_new.php", true);
+				request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			
+				request.send(data);
+		}	
+			
+	 function fqlQuery_json()
+	 {
+			showLoader(true);
+				
+			FB.api('/me', function(response) 
+			{
+				showLoader(false);
+               	var  user=response.id;			
+				runAjaxEvaluation(user);	
+			});
+	}
+
+
+		
+	function showLoader(status)
+	{
+           if (status)
+                 document.getElementById('loader').style.display = 'block';
+           else
+                 document.getElementById('loader').style.display = 'none';
+    }
+
+   </script>
+		
+		<h3>Data Aggregrator	
+        <button id="fb-auth">Facebook Login</button></h3>
+        <div id="loader" style="display:none">
+		
+		  
+        </div>
+        <br />
+        <div id="user-info"></div>
+        <br />
+        <div id="debug"></div>
+		        
+        <div id="other" style="display:none">
+        
+		    <!--a href="#" onclick="fqlQuery_json(); return false;">FQL Friends</a-->
+			<input type="button" onclick="fqlQuery_json()" value="Aggregrate Information">
+			<!--button id="bt" onclick="fqlQuery_json">Store Contacts</button-->
+		
+        </div>
+		<div id="result">
+		</div>
+					<!--<script type="text/javascript" src="json.js"></script> -->
+		
+    </body>
+</html>
